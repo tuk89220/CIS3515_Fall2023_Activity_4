@@ -20,27 +20,37 @@ class MainActivity : AppCompatActivity() {
 
         textSizeSelector = findViewById(R.id.textSizeSelectorRecyclerView)
         textSizeDisplay = findViewById(R.id.textSizeDisplayTextView)
+
         // Trying to create array of integers that are multiples of 5
         // Verify correctness by examining array values.
         val textSizes = Array(20){(it + 1) * 5}
 
+        val callback = {textSize: Float -> textSizeDisplay.textSize = textSize}
+
         Log.d("Array Values", textSizes.contentToString())
 
-        textSizeSelector.adapter = TextSizeAdapter(textSizes)
+        textSizeSelector.adapter = TextSizeAdapter(textSizes){
+            textSizeDisplay.textSize = it
+        }
         textSizeSelector.layoutManager = LinearLayoutManager(this)
     }
 }
 
 
 /* Convert to RecyclerView.Adapter */
-class TextSizeAdapter(_textSizes: Array<Int>): RecyclerView.Adapter<TextSizeAdapter.TextSizeViewHolder>(){
+class TextSizeAdapter(_textSizes: Array<Int>, _callback: (Float) -> Unit) : RecyclerView.Adapter<TextSizeAdapter.TextSizeViewHolder>(){
     val textSizes = _textSizes
-    class TextSizeViewHolder(view: TextView) : RecyclerView.ViewHolder(view){
-    val TextView = view
+    val callback = _callback
+
+    inner class TextSizeViewHolder(view: TextView) : RecyclerView.ViewHolder(view){
+    val textView = view
+        init{
+            textView.setOnClickListener{ callback(textSizes[adapterPosition].toFloat())}
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TextSizeViewHolder {
-        return TextSizeViewHolder(TextView(parent.context).apply{ setPadding(50,20,0,20)})
+        return TextSizeViewHolder(TextView(parent.context).apply{ setPadding(5,20,0,20)})
     }
 
     override fun getItemCount(): Int {
@@ -48,7 +58,7 @@ class TextSizeAdapter(_textSizes: Array<Int>): RecyclerView.Adapter<TextSizeAdap
     }
 
     override fun onBindViewHolder(holder: TextSizeViewHolder, position: Int) {
-        holder.TextView.apply{
+        holder.textView.apply{
             text = textSizes[position].toString()
             textSize = textSizes[position].toFloat()
         }
