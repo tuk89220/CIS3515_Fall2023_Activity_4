@@ -1,11 +1,13 @@
 package edu.temple.activity4
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -18,6 +20,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportActionBar?.title = "Dashboard"
+
         textSizeSelector = findViewById(R.id.textSizeSelectorRecyclerView)
         textSizeDisplay = findViewById(R.id.textSizeDisplayTextView)
 
@@ -26,12 +30,17 @@ class MainActivity : AppCompatActivity() {
         val textSizes = Array(20){(it + 1) * 5}
 
         val callback = {textSize: Float -> textSizeDisplay.textSize = textSize}
-
+        val Launchintent = Intent(this@MainActivity,Activity2::class.java)
         Log.d("Array Values", textSizes.contentToString())
 
         textSizeSelector.adapter = TextSizeAdapter(textSizes){
-            textSizeDisplay.textSize = it
+            Launchintent.putExtra("textSize",it)
+            startActivity(Launchintent)
+            //textSizeDisplay.textSize = it
+
         }
+
+
         textSizeSelector.layoutManager = LinearLayoutManager(this)
     }
 }
@@ -44,8 +53,9 @@ class TextSizeAdapter(_textSizes: Array<Int>, _callback: (Float) -> Unit) : Recy
 
     inner class TextSizeViewHolder(view: TextView) : RecyclerView.ViewHolder(view){
     val textView = view
+
         init{
-            textView.setOnClickListener{ callback(textSizes[adapterPosition].toFloat())}
+            textView.setOnClickListener{callback(textSizes[adapterPosition].toFloat()) }
         }
     }
 
@@ -64,5 +74,5 @@ class TextSizeAdapter(_textSizes: Array<Int>, _callback: (Float) -> Unit) : Recy
         }
     }
 
-
 }
+
